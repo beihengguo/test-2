@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpine Home Air — HVAC Landing Page (UX Improvements)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', sans-serif; background: #f5f5f5; }
+
+    /* ── Design tokens ── */
+    :root {
+      --alpine-blue: #0d61a7;
+      --alpine-dark: #0a4e88;
+      --primary: #0d61a7;
+      --text-primary: #1a1a1a;
+      --text-secondary: #555;
+      --text-muted: #999;
+      --border: #a4a4a4;
+      --border-light: #e0e0e0;
+    }
+
+    /* ── Layout helpers ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 24px 0; width: 100%; }
+    .section--white { background: #f5f5f5; }
+    .section--trust { padding: 0 24px; }
+    .section--trust .container { background: #fff; padding: 13px 24px; }
+
+    /* ── Promo bar ── */
+    .promo-bar { background: #2e7d32; color: #fff; text-align: center; font-size: 0.78rem; padding: 7px 40px; position: relative; font-weight: 500; }
+    .promo-bar__close { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; cursor: pointer; font-size: 0.95rem; opacity: 0.8; line-height: 1; }
+
+    /* ── Sub-nav (info bar) ── */
+    .subnav { background: #1a3668; padding: 5px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .subnav__left { font-size: 0.68rem; color: rgba(255,255,255,0.7); font-style: italic; letter-spacing: 0.02em; }
+    .subnav__right { display: flex; gap: 20px; align-items: center; font-size: 0.68rem; color: rgba(255,255,255,0.75); }
+    .subnav__right a { color: rgba(255,255,255,0.9); text-decoration: underline; text-underline-offset: 2px; }
+
+    /* ── Main navigation ── */
+    .nav { background: #0d61a7; padding: 10px 24px; display: flex; align-items: center; gap: 0; }
+    .nav__logo { display: flex; flex-direction: column; line-height: 1; text-decoration: none; margin-right: 20px; }
+    .nav__logo-name { color: #fff; font-weight: 800; font-size: 1.6rem; font-style: italic; letter-spacing: -1px; }
+    .nav__logo-sub { color: rgba(255,255,255,0.7); font-size: 0.52rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px; }
+    .nav__phone { display: flex; flex-direction: column; margin-right: 24px; flex-shrink: 0; }
+    .nav__phone-number { color: #fff; font-size: 0.9rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+    .nav__phone-status { display: flex; align-items: center; gap: 4px; font-size: 0.58rem; color: rgba(255,255,255,0.85); font-weight: 600; margin-top: 2px; }
+    .nav__phone-dot { width: 6px; height: 6px; border-radius: 50%; background: #4caf50; flex-shrink: 0; }
+    .nav__search { flex: 1; display: flex; margin-right: 16px; }
+    .nav__search input { width: 100%; padding: 9px 14px; border: none; border-radius: 2px 0 0 2px; font-size: 0.85rem; outline: none; font-family: 'Open Sans', sans-serif; color: #333; }
+    .nav__search input::placeholder { color: #aaa; }
+    .nav__search-btn { background: #fff; border: none; border-left: 1px solid #ddd; padding: 9px 14px; border-radius: 0 2px 2px 0; cursor: pointer; font-size: 1rem; color: #555; flex-shrink: 0; }
+    .nav__cart { position: relative; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; margin-right: 12px; padding: 4px; }
+    .nav__cart-icon { font-size: 1.4rem; }
+    .nav__cart-badge { position: absolute; top: 0; right: 0; background: #ff6b00; color: #fff; font-size: 0.52rem; font-weight: 700; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .nav__shop { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 8px 16px; border-radius: 2px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: 'Open Sans', sans-serif; flex-shrink: 0; }
+    .nav__shop:hover { background: rgba(255,255,255,0.2); }
+    @media (max-width: 768px) {
+      .subnav { display: none; }
+      .nav__search { display: none; }
+      .nav__phone { display: none; }
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 1 — HERO (Option A: Split 60/40)
+       Centered at 960px — same width as all section content
+    ══════════════════════════════════════ */
+    .hero-outer {
+      background: #f5f5f5;
+      padding: 24px 24px 0;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 58% 42%;
+      min-height: auto;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .hero__text {
+      background: #1a2e4a;
+      padding: 24px 44px;
+      display: flex; flex-direction: column; justify-content: center; gap: 20px;
+    }
+    .hero__img {
+      background: #dce8f3;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero__img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+    .hero__img-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #dbe8f5 0%, #c4d9ef 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--alpine-blue); font-size: 0.8rem; font-weight: 600; gap: 10px;
+    }
+    .hero h1 {
+      font-size: clamp(1.35rem, 2.3vw, 1.9rem);
+      font-weight: 700; color: #fff; line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+    .hero p.hero__sub {
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
+      color: rgba(255,255,255,0.88); line-height: 1.65;
+    }
+    .hero__ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; border-radius: 4px; font-family: 'Open Sans', sans-serif; font-weight: 600; font-size: 0.87rem; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .btn--primary { background: var(--primary); color: #fff; border: 1px solid var(--primary); }
+    .btn--primary:hover { background: #0a4e88; border-color: #0a4e88; }
+    .btn--outline-white { background: transparent; color: #fff; border: 1px solid #fff; }
+    .btn--outline-white:hover { background: rgba(255,255,255,0.1); }
+    .hero__microcopy { font-size: 0.82rem; color: rgba(255,255,255,0.62); }
+    .arrow { font-size: 1rem; }
+    @media (max-width: 768px) {
+      .hero-outer { padding: 20px 16px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero__img { min-height: 200px; }
+      .hero__text { padding: 32px 24px; }
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 2 — TRUST BAR (NEW)
+    ══════════════════════════════════════ */
+    .trust-bar__items { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: center; justify-content: center; }
+    .trust-item { display: flex; align-items: center; gap: 7px; }
+    .trust-item__icon { font-size: 0.95rem; line-height: 1; }
+    .trust-item span { font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; }
+    .trust-divider { color: #ddd; margin: 0 4px; }
+
+    /* ══════════════════════════════════════
+       SECTION 3 — START HERE (TOOLS)
+    ══════════════════════════════════════ */
+    .section-label {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    .section-label::after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 36px;
+      height: 3px;
+      background: var(--alpine-blue);
+      border-radius: 2px;
+    }
+    .section-sublabel { font-size: 0.92rem; color: #666; margin-bottom: 24px; margin-top: 8px; }
+
+    .tools-panel { background: #fff; border: 1px solid var(--border-light); box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; }
+    .tools-panel__bar { background: var(--alpine-dark); height: 4px; }
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 3px solid #ebebeb; }
+    .tool-card {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 24px 12px 18px;
+      border-right: 1px solid #ebebeb;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .tool-card:last-child { border-right: none; }
+    .tool-card:hover { background: rgba(13, 97, 167, 0.04); }
+    .tool-card__icon { font-size: 2rem; opacity: 0.6; line-height: 1; }
+    .tool-card__title { font-weight: 600; font-size: 0.85rem; color: #333; text-align: center; }
+    .tool-card__sub { font-size: 0.72rem; color: var(--text-muted); text-align: center; }
+    .tool-badge {
+      position: absolute; top: 8px; right: 8px;
+      background: #e3f2fd; color: var(--alpine-blue);
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 2px 6px; border-radius: 4px;
+    }
+
+    .expert-nudge {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 14px 2px 0;
+      flex-wrap: wrap;
+    }
+    .expert-nudge p { font-size: 0.88rem; color: var(--text-secondary); }
+    .btn--text { background: none; border: none; color: var(--alpine-blue); font-family: 'Open Sans', sans-serif; font-weight: 600; font-size: 0.83rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 0; }
+    .btn--text:hover { text-decoration: underline; }
+
+    /* ══════════════════════════════════════
+       SECTION 4 — SHOP BY CATEGORY
+    ══════════════════════════════════════ */
+    .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .cat-card {
+      background: #fff; border: 1px solid var(--border); display: flex; flex-direction: column;
+      transition: box-shadow 0.15s;
+    }
+    .cat-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+    .cat-card__bar { background: var(--alpine-blue); height: 5px; flex-shrink: 0; }
+    .cat-card__body { padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .chip {
+      display: inline-flex; align-items: center;
+      background: var(--alpine-blue); color: #fff;
+      font-size: 0.72rem; font-weight: 400; padding: 2px 8px;
+      border-radius: 4px; height: 22px;
+    }
+    .cat-card__title { font-weight: 700; font-size: 0.88rem; color: #333; }
+    .cat-card__desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.55; flex: 1; }
+    .cat-card__browse { display: inline-flex; align-items: center; gap: 5px; color: var(--alpine-blue); font-size: 0.78rem; font-weight: 600; text-decoration: none; margin-top: 4px; }
+    .cat-card__browse:hover { text-decoration: underline; }
+    .cat-card__img { margin-top: 12px; height: 160px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .cat-card__img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .cat-card__img span { font-size: 0.7rem; color: #bbb; }
+
+    /* ══════════════════════════════════════
+       SECTION 5 — WHY ALPINE
+    ══════════════════════════════════════ */
+    /* Why Alpine trust badges */
+    .why-subtitle { font-size: 0.9rem; color: #666; line-height: 1.6; margin-bottom: 16px; }
+    .why-badges {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 24px;
+    }
+    .why-divider { width: 1px; height: 80px; background: #909090; flex-shrink: 0; }
+    /* ResellerRatings */
+    .reseller-block {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 105px;
+      padding-left: 16px;
+      flex-shrink: 0;
+    }
+    .reseller-circle {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: #D63384;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .reseller-circle img { width: 32px; height: 32px; }
+    .reseller-text { display: flex; flex-direction: column; gap: 2px; }
+    .reseller-stars { display: flex; gap: 2px; margin-bottom: 2px; }
+    .reseller-stars svg { width: 17px; height: 17px; }
+    .reseller-rating { font-family: 'Roboto', sans-serif; font-size: 12px; color: #343a40; white-space: nowrap; }
+    .reseller-reviews { font-family: 'Roboto', sans-serif; font-size: 12px; color: #343a40; white-space: nowrap; }
+    .reseller-elite { font-family: 'Roboto', sans-serif; font-size: 12px; color: #1A4C9C; font-weight: 700; white-space: nowrap; }
+    /* Shopper Approved */
+    .shopper-block { display: flex; align-items: center; flex-shrink: 0; }
+    .shopper-block img {
+      width: 160px;
+      height: 38.64px;
+      object-fit: contain;
+      display: block;
+    }
+    /* BBB */
+    .bbb-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      padding-right: 16px;
+    }
+    .bbb-block img {
+      width: 60px;
+      height: 51px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+    .bbb-label {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 13.6px;
+      line-height: 20.4px;
+      color: #343a40;
+      white-space: nowrap;
+    }
+    .bbb-label strong { color: #0061ae; font-weight: 700; display: block; }
+    @media (max-width: 768px) {
+      .why-badges { flex-direction: column; align-items: flex-start; gap: 20px; padding: 16px; }
+      .why-divider { width: 100%; height: 1px; }
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 6 — SEO CONTENT
+    ══════════════════════════════════════ */
+    /* SEO Article */
+    .seo-content { background: #fff; }
+    .seo-content p { font-size: 0.9rem; color: #333; line-height: 1.72; margin-bottom: 14px; width: 100%; }
+    .seo-content h2 { font-size: 1.35rem; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+    .seo-content h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 22px 0 10px; padding-top: 20px; border-top: 1px solid rgba(51,51,51,0.15); }
+    .seo-content ul { margin: 10px 0 16px 20px; }
+    .seo-content li { font-size: 0.9rem; color: #333; line-height: 1.72; margin-bottom: 14px; }
+    .seo-content li strong { font-weight: 700; }
+    /* Collapse/expand */
+    .seo-preview { }
+    .seo-full {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease;
+    }
+    .seo-full.is-open {
+      max-height: 4000px;
+      opacity: 1;
+    }
+    .seo-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: none; padding: 0;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--alpine-blue);
+      cursor: pointer; margin-top: 6px;
+      text-decoration: none;
+    }
+    .seo-toggle:hover { text-decoration: underline; }
+    .seo-toggle__icon { transition: transform 0.3s ease; display: inline-block; }
+    .seo-toggle.is-open .seo-toggle__icon { transform: rotate(180deg); }
+
+    /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+    .footer { background: #222; color: rgba(255,255,255,0.85); padding: 44px 0 28px; }
+    .footer__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 32px; }
+    .footer__col-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+    .footer__link { display: block; font-size: 0.8rem; color: rgba(255,255,255,0.75); text-decoration: none; margin-bottom: 8px; }
+    .footer__link:hover { color: #fff; }
+    .footer__bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer__copy { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .category-grid { grid-template-columns: repeat(2, 1fr); }
+      .why-badges { flex-direction: column; align-items: flex-start; gap: 20px; padding: 16px; }
+      .why-divider { width: 100%; height: 1px; }
+    }
+    @media (max-width: 640px) {
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+      .tools-grid .tool-card:nth-child(2) { border-right: none; }
+      .tools-grid .tool-card:nth-child(1),
+      .tools-grid .tool-card:nth-child(2) { border-bottom: 1px solid #ebebeb; }
+      .category-grid { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr; }
+      .trust-bar__items { gap: 8px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Promo Bar ── -->
+<div class="promo-bar">
+  Place Your Order by 1 pm for Same-Day Shipping
+  <button class="promo-bar__close" onclick="this.parentElement.style.display='none'">✕</button>
+</div>
+
+<!-- ── Info Sub-nav ── -->
+<div class="subnav">
+  <span class="subnav__left">AMERICA'S HEATING &amp; COOLING STORE ®, EST 2002</span>
+  <div class="subnav__right">
+    <span>Free Shipping &nbsp;<a href="#">See Details</a></span>
+    <span>Your Location: &nbsp;<a href="#">Smyrna, GA</a></span>
+  </div>
+</div>
+
+<!-- ── Main Navigation ── -->
+<nav class="nav">
+  <a href="#" class="nav__logo">
+    <span class="nav__logo-name">Alpine</span>
+    <span class="nav__logo-sub">Home Air Products™</span>
+  </a>
+  <div class="nav__phone">
+    <a href="tel:8008655931" class="nav__phone-number">☎ (800) 865-5931</a>
+    <span class="nav__phone-status"><span class="nav__phone-dot"></span> OPEN NOW</span>
+  </div>
+  <div class="nav__search">
+    <input type="text" placeholder="Search For Products" />
+    <button class="nav__search-btn">🔍</button>
+  </div>
+  <a href="#" class="nav__cart">
+    <span class="nav__cart-badge">0</span>
+    <span class="nav__cart-icon">🛒</span>
+  </a>
+  <button class="nav__shop">Shop &nbsp;☰</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+  SECTION 1 — HERO (Option A: Split 60/40)
+  CHANGE: Text left panel · Image right panel · No overlay
+  CHANGE: "Find My System" is primary CTA
+══════════════════════════════════════ -->
+<div class="hero-outer">
+  <section class="hero">
+
+    <!-- Text panel (left 58%) -->
+    <div class="hero__text">
+      <h1>Stop Guessing. Find the Right HVAC System for Your Home.</h1>
+      <p class="hero__sub">Answer a few questions and we'll match you to the right system — or talk to a specialist for free. No pressure, no guesswork.</p>
+      <div class="hero__ctas">
+        <a href="#start-here" class="btn btn--primary">Find My System <span class="arrow">→</span></a>
+        <a href="#" class="btn btn--outline-white">Talk to an Expert — Free</a>
+      </div>
+      <p class="hero__microcopy">Free matching tools &nbsp;·&nbsp; No guesswork &nbsp;·&nbsp; Expert support since 2002</p>
+    </div>
+
+    <div class="hero__img">
+      <img
+        src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80"
+        alt="Modern HVAC system installed on a home"
+      />
+    </div>
+
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+  SECTION 2 — TRUST BAR (NEW)
+  CHANGE: Trust signals moved above the fold
+══════════════════════════════════════ -->
+<section class="section section--trust">
+  <div class="container">
+    <div class="trust-bar__items">
+      <div class="trust-item">
+        <span class="trust-item__icon">⭐</span>
+        <span>4.8 Stars · 12,000+ Reviews</span>
+      </div>
+      <span class="trust-divider">|</span>
+      <div class="trust-item">
+        <span class="trust-item__icon" style="color:#4caf50">✔</span>
+        <span>Free Expert Support</span>
+      </div>
+      <span class="trust-divider">|</span>
+      <div class="trust-item">
+        <span class="trust-item__icon" style="color:#4caf50">✔</span>
+        <span>Trusted Since 2002</span>
+      </div>
+      <span class="trust-divider">|</span>
+      <div class="trust-item">
+        <span class="trust-item__icon" style="color:var(--alpine-blue)">📞</span>
+        <span>1-800-865-5931</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SECTION 3 — START HERE (TOOLS)
+  CHANGE: Renamed + "Start Here" badge on top tool
+  CHANGE: Expert CTA surfaced inline (was at page bottom)
+══════════════════════════════════════ -->
+<section class="section" id="start-here">
+  <div class="container">
+    <h2 class="section-label">Start Here — Find Your System</h2>
+    <p class="section-sublabel">Answer a few quick questions — we'll recommend the exact system for your home in under 2 minutes.</p>
+
+    <div class="tools-panel">
+      <div class="tools-panel__bar"></div>
+      <div class="tools-grid">
+
+        <a href="#" class="tool-card">
+          <span class="tool-badge">START HERE</span>
+          <div class="tool-card__icon">🔧</div>
+          <div class="tool-card__title">System Selector</div>
+          <div class="tool-card__sub">Answer a few questions</div>
+        </a>
+
+        <a href="#" class="tool-card">
+          <div class="tool-card__icon">📐</div>
+          <div class="tool-card__title">Sizing Estimator</div>
+          <div class="tool-card__sub">BTU calc by room size</div>
+        </a>
+
+        <a href="#" class="tool-card">
+          <div class="tool-card__icon">📷</div>
+          <div class="tool-card__title">Quote-by-Photo</div>
+          <div class="tool-card__sub">Upload a photo of your unit</div>
+        </a>
+
+        <a href="#" class="tool-card">
+          <div class="tool-card__icon">💰</div>
+          <div class="tool-card__title">Cost Calculator</div>
+          <div class="tool-card__sub">Estimate annual savings</div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="expert-nudge">
+      <p>Still not sure where to start? Our HVAC specialists can help you choose — for free.</p>
+      <a href="#" class="btn--text">Talk to an Expert <span>→</span></a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SECTION 4 — SHOP BY CATEGORY
+  CHANGE: Browse CTA is now a visible link button
+  CHANGE: Consistent card height via flex layout
+══════════════════════════════════════ -->
+<section class="section section--white">
+  <div class="container">
+    <h2 class="section-label">Shop by Category</h2>
+    <p class="section-sublabel">Browse by system type if you already know what you're looking for.</p>
+
+    <div class="category-grid">
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <span class="chip">Easy Installation</span>
+          <div class="cat-card__title">Ductless Mini-Splits</div>
+          <p class="cat-card__desc">Ductless mini-split air conditioning systems for homes without ductwork, room additions, or zoned cooling.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/a01b134135381972bbffd6a657b93a6ed4651cc2.png" alt="Ductless Mini-Splits"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <span class="chip">Energy Efficient</span>
+          <div class="cat-card__title">Next Gen Ducted Systems</div>
+          <p class="cat-card__desc">Ducted HVAC systems for whole-home heating and cooling using existing ductwork.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/2797fe7d70b65aaac214c3598b12756bd80dbc03.png" alt="Next Gen Ducted Systems"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <span class="chip">Standard Home Setup</span>
+          <div class="cat-card__title">Central Air Systems</div>
+          <p class="cat-card__desc">Central air conditioners and heat pumps for reliable whole-home cooling and heating.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/f3f88839d71068bd854def0bbf31a2cd52ba8c7c.png" alt="Central Air Systems"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <div class="cat-card__title">Complete HVAC Systems</div>
+          <p class="cat-card__desc">Complete heating and cooling systems with matched indoor and outdoor units for full-home comfort.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/083990010c9dabb97145818e4df994512eb8d437.png" alt="Complete HVAC Systems"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <div class="cat-card__title">PTAC Units</div>
+          <p class="cat-card__desc">Packaged terminal air conditioners ideal for hotels, apartments, and room-by-room cooling.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/cd963249907c9619af44144bdf591aed465e6ff7.png" alt="PTAC Units"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <div class="cat-card__title">Packaged Units</div>
+          <p class="cat-card__desc">All-in-one packaged HVAC units for rooftop or ground installation in residential or commercial spaces.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/e4403b737e7bf842ad68eb3c65669c944b7d8744.png" alt="Packaged Units"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <div class="cat-card__title">Wall-Mounted Units</div>
+          <p class="cat-card__desc">Wall-mounted heating and cooling units for apartments, hotels, and room additions.</p>
+          <a href="#" class="cat-card__browse">Browse In Stock Systems →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/3e3eb4f0e36a1c9fa7e77867079063020e9236c9.png" alt="Wall-Mounted Units"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <div class="cat-card__title">Installation Supplies</div>
+          <p class="cat-card__desc">HVAC installation supplies including line sets, disconnect boxes, pads, and essential components.</p>
+          <a href="#" class="cat-card__browse">Browse Supplies &amp; Components →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/d19d949485297b10c3b82b7935fbe53ec479f6d9.png" alt="Installation Supplies"></div>
+        </div>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-card__bar"></div>
+        <div class="cat-card__body">
+          <div class="cat-card__title">Scratch &amp; Dent Deals</div>
+          <p class="cat-card__desc">Discounted HVAC systems with minor cosmetic imperfections, fully functional and ready to install.</p>
+          <a href="#" class="cat-card__browse">View Deals →</a>
+          <div class="cat-card__img"><img src="http://localhost:3845/assets/290b479f13ff7a2f5b94bf8fb3e04fa0491ea62b.png" alt="Scratch &amp; Dent Deals"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SECTION 5 — WHY ALPINE
+  CHANGE: Moved BEFORE categories (was after)
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-label">Trusted HVAC Specialists Since 2002</h2>
+    <p class="why-subtitle">Not just a product catalog — Alpine specialists help you buy the right system, installed right, the first time. Rated by 7,600+ customers.</p>
+
+    <div class="why-badges">
+
+      <!-- ResellerRatings -->
+      <div class="reseller-block">
+        <div class="reseller-circle">
+          <img src="http://localhost:3845/assets/2cc345ce8a5e1c4f6222327768fd1e0db86e697e.svg" alt="ResellerRatings">
+        </div>
+        <div class="reseller-text">
+          <div class="reseller-stars">
+            <svg viewBox="0 0 17 17" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><polygon points="8.5,1 10.9,6.2 16.5,6.9 12.5,10.8 13.5,16.4 8.5,13.6 3.5,16.4 4.5,10.8 0.5,6.9 6.1,6.2"/></svg>
+            <svg viewBox="0 0 17 17" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><polygon points="8.5,1 10.9,6.2 16.5,6.9 12.5,10.8 13.5,16.4 8.5,13.6 3.5,16.4 4.5,10.8 0.5,6.9 6.1,6.2"/></svg>
+            <svg viewBox="0 0 17 17" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><polygon points="8.5,1 10.9,6.2 16.5,6.9 12.5,10.8 13.5,16.4 8.5,13.6 3.5,16.4 4.5,10.8 0.5,6.9 6.1,6.2"/></svg>
+            <svg viewBox="0 0 17 17" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><polygon points="8.5,1 10.9,6.2 16.5,6.9 12.5,10.8 13.5,16.4 8.5,13.6 3.5,16.4 4.5,10.8 0.5,6.9 6.1,6.2"/></svg>
+            <svg viewBox="0 0 17 17" fill="#F5A623" xmlns="http://www.w3.org/2000/svg"><polygon points="8.5,1 10.9,6.2 16.5,6.9 12.5,10.8 13.5,16.4 8.5,13.6 3.5,16.4 4.5,10.8 0.5,6.9 6.1,6.2"/></svg>
+          </div>
+          <span class="reseller-rating">4.8 Store Rating</span>
+          <span class="reseller-reviews">7,671 Customer Reviews</span>
+          <span class="reseller-elite">Elite Store Rated</span>
+        </div>
+      </div>
+
+      <div class="why-divider"></div>
+
+      <!-- Shopper Approved -->
+      <div class="shopper-block">
+        <img src="http://localhost:3845/assets/11a5b04e41016e7f48a5058990d36ab26ff8f2f0.png" alt="Shopper Approved — 44K+ Reviews">
+      </div>
+
+      <div class="why-divider"></div>
+
+      <!-- BBB -->
+      <div class="bbb-block">
+        <img src="http://localhost:3845/assets/48f5d708d6481c9ed0740dab95ce0e9ee2c00cdf.svg" alt="BBB A+ Rating">
+        <div class="bbb-label">
+          A+ Rating From the
+          <strong>Better Business Bureau</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SECTION 6 — SEO / ABOUT CONTENT
+══════════════════════════════════════ -->
+<section class="section seo-content">
+  <div class="container">
+    <h2 class="section-label">The Complete Guide to Home HVAC Systems</h2>
+
+    <!-- Always-visible preview -->
+    <div class="seo-preview">
+      <p>Air conditioning is a technology that has revolutionized the way we live, work, and play. From hot summers to chilly winters, air conditioning systems help us maintain a comfortable indoor environment regardless of the weather conditions outside. Here we'll provide an overview of air conditioning technology and explore some of the key factors to consider when choosing an air conditioning system for your home or business.</p>
+    </div>
+
+    <!-- Expandable full article -->
+    <div class="seo-full" id="seo-full">
+
+      <h3>History of Air Conditioning</h3>
+      <p>Air conditioning technology dates back to ancient times, with the Egyptians and Persians using wind catchers to cool their homes and buildings. However, modern air conditioning systems did not emerge until the early 20th century, when Willis Carrier invented the first air conditioning unit for a printing plant in New York City. Over time, air conditioning technology has become more advanced and sophisticated, leading to the development of a wide range of systems for homes and businesses, provided by a number of top Brands. In 2023, these Top Brands, such as Carrier, Trane, Lennox, Mitsubishi, Rheem, Goodman, and our own in-house brand, Blueridge, continue to push the industry forward with better and more efficient offerings.</p>
+
+      <h3>Types of Air Conditioning Systems</h3>
+      <p>There are several different types of air conditioning systems available on the market today, each with its own features and benefits. Some of the most common types of air conditioning systems which Alpine carries include:</p>
+      <ul>
+        <li><strong>Ductless Mini-Split Air Conditioning Systems</strong> — Ductless mini-split systems are a type of air conditioning unit that does not require ductwork, making them an ideal choice for homes or businesses that cannot accommodate traditional ducted systems. They consist of an outdoor unit connected to one or more indoor units and allow for zoned cooling and heating control.</li>
+        <li><strong>Ultra Efficient Ducted Heat Pump Air Handler Complete Systems</strong> — Ultra-efficient ducted heat pump systems use electricity to transfer heat between the indoors and outdoors, providing both heating and cooling capabilities. These units also help to combine the technology of a Mini-Split system, with existing ductwork that might be running through the home. They are highly energy-efficient and can save homeowners money on their energy bills while also reducing their carbon footprint.</li>
+        <li><strong>Split System Central Air Conditioners and Heat Pumps</strong> — Split system central air conditioners and heat pumps consist of an outdoor unit that houses the compressor and an indoor unit that distributes cool air throughout the home or business. They are a popular choice for homes and businesses that require a high level of cooling capacity and efficiency.</li>
+        <li><strong>Central Heating &amp; Cooling Complete Systems</strong> — Central heating and cooling systems are comprehensive solutions that provide both heating and cooling capabilities for the entire home or business. They typically include a furnace, an air conditioning unit, and a ductwork system.</li>
+        <li><strong>Hotel-Style Heating and Cooling Units (PTAC)</strong> — Hotel-style heating and cooling units, also known as PTAC (Packaged Terminal Air Conditioner) units, are self-contained systems that are installed through a wall or in a window. They are commonly used in hotels, apartments, and other multi-unit buildings.</li>
+        <li><strong>Self-Contained Package Unit Air Conditioning w/Heat Option</strong> — Self-contained package units are all-in-one heating and cooling systems that are typically installed on the roof or outside of the building. They include all necessary components, such as a compressor, evaporator, and condenser, in a single unit.</li>
+        <li><strong>Air Handlers and All-Electric Furnaces</strong> — Air handlers and all-electric furnaces work together to distribute heated or cooled air throughout a home or business. They are typically installed in conjunction with a central air conditioning or heat pump system.</li>
+        <li><strong>Split-System Installation Supplies and Components</strong> — Split-system installation supplies and components include everything needed to install a split system air conditioning or heat pump unit, such as refrigerant lines, electrical wiring, and mounting brackets.</li>
+      </ul>
+
+      <h3>Factors to Consider When Choosing an Air Conditioning System</h3>
+      <p>When choosing an air conditioning system, there are several factors to consider, including:</p>
+      <ul>
+        <li><strong>Size:</strong> The size of the air conditioning system should be appropriate for the size of the building or room that will be cooled. An undersized unit will struggle to cool the space, while an oversized unit will waste energy and money.</li>
+        <li><strong>Efficiency:</strong> Look for air conditioning systems with high Seasonal Energy Efficiency Ratios (SEER) and Energy Efficiency Ratios (EER). You can also consider SEER2 and HSPF2 Ratings. Higher ratings indicate more energy-efficient systems that will save you money on your energy bills.</li>
+        <li><strong>Cost:</strong> Consider the upfront cost of the system, as well as any ongoing maintenance or repair costs. While more expensive systems may be more efficient and durable, they may not always be the best choice for your budget. However, consider the trade-offs of spending a bit more on your system now, but reducing your monthly energy costs with more efficient equipment in the long term.</li>
+        <li><strong>Installation:</strong> Some air conditioning systems may require professional installation, while others can be installed by homeowners. Be sure to factor in the cost of installation and any necessary modifications to your home or building. Here at Alpine, there are options for both, with DIY units ready for you to install in an afternoon, or whole house systems that will require a combo of DIY and professional installation.</li>
+        <li><strong>Maintenance:</strong> Regular maintenance is essential for keeping your air conditioning system running smoothly and efficiently. Be sure to follow the manufacturer's recommendations for maintenance and schedule annual tune-ups with a qualified HVAC professional. You can also call our Alpine Tech Support Department and Warranty Assistance Team for help along the way.</li>
+      </ul>
+
+      <h3>Conclusion</h3>
+      <p>Air conditioning systems are an essential part of modern life, providing us with a comfortable indoor environment regardless of the weather conditions outside. When choosing an air conditioning system, be sure to consider the size, efficiency, cost, installation, and maintenance requirements of the system to ensure that it meets your needs and budget. By selecting the right air conditioning system from Alpine Home Air's wide selection of top quality products for your home or business, you can enjoy improved comfort, energy savings, and peace of mind for years to come.</p>
+
+    </div>
+
+    <button class="seo-toggle" id="seo-toggle" onclick="toggleSeoGuide(this)" aria-expanded="false" aria-controls="seo-full">
+      Read the full guide <span class="seo-toggle__icon">↓</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  function toggleSeoGuide(btn) {
+    var full = document.getElementById('seo-full');
+    var isOpen = full.classList.contains('is-open');
+    if (isOpen) {
+      full.classList.remove('is-open');
+      btn.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = 'Read the full guide <span class="seo-toggle__icon">↓</span>';
+    } else {
+      full.classList.add('is-open');
+      btn.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+      btn.innerHTML = 'Show less <span class="seo-toggle__icon" style="transform:rotate(180deg);display:inline-block">↓</span>';
+    }
+  }
+</script>
+
+<!-- ══════════════════════════════════════
+  FOOTER
+══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__col-title">Alpine</div>
+        <a href="#" class="footer__link">About Us</a>
+        <a href="#" class="footer__link">Careers</a>
+        <a href="#" class="footer__link">Press</a>
+        <a href="#" class="footer__link">Blog</a>
+      </div>
+      <div>
+        <div class="footer__col-title">My Account</div>
+        <a href="#" class="footer__link">Sign In</a>
+        <a href="#" class="footer__link">Order Status</a>
+        <a href="#" class="footer__link">Returns</a>
+        <a href="#" class="footer__link">Wishlist</a>
+      </div>
+      <div>
+        <div class="footer__col-title">Support</div>
+        <a href="#" class="footer__link">Contact Us</a>
+        <a href="#" class="footer__link">FAQ</a>
+        <a href="#" class="footer__link">Installation Help</a>
+        <a href="#" class="footer__link">Warranty</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">© 2024 Alpine Home Air Products. All rights reserved.</span>
+      <div style="display:flex;gap:20px;">
+        <a href="#" class="footer__link" style="margin:0;font-size:0.7rem;">Cookie Policy</a>
+        <a href="#" class="footer__link" style="margin:0;font-size:0.7rem;">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
